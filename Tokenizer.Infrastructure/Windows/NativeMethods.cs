@@ -41,6 +41,8 @@ public static class NativeMethods
     public const uint TpmLeftAlign = 0x0000;
     public const uint TpmBottomAlign = 0x0020;
     public const uint TpmRightButton = 0x0002;
+    public const uint ImageIcon = 1;
+    public const uint LrLoadFromFile = 0x00000010;
     public const int RgnOr = 2;
 
     public const int IdApplication = 32512;
@@ -290,6 +292,13 @@ public static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern nint LoadIcon(nint instance, nint iconName);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern nint LoadImage(nint instance, string name, uint type, int width, int height, uint flags);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DestroyIcon(nint iconHandle);
 
     [DllImport("user32.dll")]
     public static extern nint LoadCursor(nint instance, nint cursorName);

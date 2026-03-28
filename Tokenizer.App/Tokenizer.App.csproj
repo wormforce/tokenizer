@@ -13,6 +13,7 @@
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <WindowsAppSdkDeploymentManagerInitialize>false</WindowsAppSdkDeploymentManagerInitialize>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +29,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Tokenizer.Core\Tokenizer.Core.csproj" />
     <ProjectReference Include="..\Tokenizer.Infrastructure\Tokenizer.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

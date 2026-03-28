@@ -15,6 +15,7 @@ public sealed class NotifyIconTrayService : ITrayService
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly TaskCompletionSource _readyTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly NativeMethods.WindowProc _windowProc;
+    private readonly nint _iconHandle;
 
     private Thread? _thread;
     private uint _threadId;
@@ -25,6 +26,7 @@ public sealed class NotifyIconTrayService : ITrayService
     public NotifyIconTrayService()
     {
         _windowProc = WndProc;
+        _iconHandle = LoadCustomIcon();
     }
 
     public event EventHandler? OpenRequested;
@@ -84,6 +86,11 @@ public sealed class NotifyIconTrayService : ITrayService
             }
 
             _thread?.Join(2000);
+
+            if (_iconHandle != 0)
+            {
+                NativeMethods.DestroyIcon(_iconHandle);
+            }
         }
         finally
         {
@@ -207,9 +214,22 @@ public sealed class NotifyIconTrayService : ITrayService
             UId = 1,
             UFlags = NativeMethods.NifMessage | NativeMethods.NifIcon | NativeMethods.NifTip,
             UCallbackMessage = TrayMessage,
-            HIcon = NativeMethods.LoadIcon(0, new nint(NativeMethods.IdApplication)),
+            HIcon = _iconHandle != 0
+                ? _iconHandle
+                : NativeMethods.LoadIcon(0, new nint(NativeMethods.IdApplication)),
             SzTip = BuildTooltipText()
         };
+    }
+
+    private static nint LoadCustomIcon()
+    {
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico");
+        if (!File.Exists(iconPath))
+        {
+            return 0;
+        }
+
+        return NativeMethods.LoadImage(0, iconPath, NativeMethods.ImageIcon, 32, 32, NativeMethods.LrLoadFromFile);
     }
 
     private string BuildTooltipText()

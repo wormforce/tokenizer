@@ -77,9 +77,27 @@ public sealed partial class MainWindow : Window
 
         var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(_windowHandle);
         _appWindow = AppWindow.GetFromWindowId(windowId);
+        ApplyWindowIcon();
         _appWindow.Resize(new SizeInt32(1340, 860));
         _appWindow.Closing += OnAppWindowClosing;
         InstallMouseHook();
+    }
+
+    private void ApplyWindowIcon()
+    {
+        if (_appWindow is null)
+        {
+            return;
+        }
+
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico");
+        if (!File.Exists(iconPath))
+        {
+            return;
+        }
+
+        _appWindow.SetIcon(iconPath);
+        _appWindow.SetTaskbarIcon(iconPath);
     }
 
     private void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
