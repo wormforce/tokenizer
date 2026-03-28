@@ -29,7 +29,7 @@
                         <TextBlock
                             MaxWidth="760"
                             Style="{StaticResource SectionSubtitleStyle}"
-                            Text="Tune startup behavior, tracking, and floating ball appearance in a layout that uses the full window width." />
+                            Text="Tune startup behavior, tracking, and floating ball appearance. Changes apply automatically." />
                     </StackPanel>
 
                     <Border
@@ -134,27 +134,6 @@
                             </Grid>
 
                             <Border Height="1" Background="{StaticResource OutlineBrush}" />
-
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Spacing="4">
-                                    <TextBlock Style="{StaticResource CardTitleStyle}" Text="Apply Changes" />
-                                    <TextBlock
-                                        Style="{StaticResource SectionSubtitleStyle}"
-                                        Text="Save the current configuration locally and push it to the tracking service immediately." />
-                                </StackPanel>
-
-                                <Button
-                                    Grid.Column="1"
-                                    MinWidth="152"
-                                    Command="{Binding SaveCommand}"
-                                    Content="Save and Apply"
-                                    VerticalAlignment="Center" />
-                            </Grid>
                         </StackPanel>
                     </Border>
 

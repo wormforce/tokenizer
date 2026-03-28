@@ -1,4 +1,3 @@
-﻿using CommunityToolkit.Mvvm.Input;
 using Tokenizer.App.Services;
 using Tokenizer.Core.Interfaces;
 using Tokenizer.Core.Models;
@@ -10,6 +9,10 @@ public sealed class SettingsViewModel : ViewModelBase
     private readonly ISettingsRepository _settingsRepository;
     private readonly IAutostartService _autostartService;
     private readonly ITypingMonitorService _typingMonitorService;
+    private CancellationTokenSource? _applyDebounceCts;
+    private AppSettingsModel _loadedSettings = new();
+    private bool _isInitializing;
+
     private const int MinimumFloatingBallOpacityPercent = 20;
     private const int MaximumFloatingBallOpacityPercent = 100;
     private const int MinimumFloatingBallSize = 60;
@@ -32,21 +35,30 @@ public sealed class SettingsViewModel : ViewModelBase
         _settingsRepository = settingsRepository;
         _autostartService = autostartService;
         _typingMonitorService = typingMonitorService;
-        SaveCommand = new AsyncRelayCommand(SaveAsync);
     }
-
-    public IAsyncRelayCommand SaveCommand { get; }
 
     public bool AutostartEnabled
     {
         get => _autostartEnabled;
-        set => SetProperty(ref _autostartEnabled, value);
+        set
+        {
+            if (SetProperty(ref _autostartEnabled, value))
+            {
+                ScheduleApply();
+            }
+        }
     }
 
     public bool FloatingBallEnabled
     {
         get => _floatingBallEnabled;
-        set => SetProperty(ref _floatingBallEnabled, value);
+        set
+        {
+            if (SetProperty(ref _floatingBallEnabled, value))
+            {
+                ScheduleApply();
+            }
+        }
     }
 
     public double FloatingBallOpacity
@@ -57,6 +69,7 @@ public sealed class SettingsViewModel : ViewModelBase
             if (SetProperty(ref _floatingBallOpacity, value))
             {
                 OnPropertyChanged(nameof(FloatingBallOpacityLabel));
+                ScheduleApply();
             }
         }
     }
@@ -71,6 +84,7 @@ public sealed class SettingsViewModel : ViewModelBase
             if (SetProperty(ref _floatingBallSize, value))
             {
                 OnPropertyChanged(nameof(FloatingBallSizeLabel));
+                ScheduleApply();
             }
         }
     }
@@ -80,13 +94,25 @@ public sealed class SettingsViewModel : ViewModelBase
     public bool LaunchMinimized
     {
         get => _launchMinimized;
-        set => SetProperty(ref _launchMinimized, value);
+        set
+        {
+            if (SetProperty(ref _launchMinimized, value))
+            {
+                ScheduleApply();
+            }
+        }
     }
 
     public bool Paused
     {
         get => _paused;
-        set => SetProperty(ref _paused, value);
+        set
+        {
+            if (SetProperty(ref _paused, value))
+            {
+                ScheduleApply();
+            }
+        }
     }
 
     public string StatusMessage
@@ -97,8 +123,11 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public async Task LoadAsync()
     {
+        _isInitializing = true;
+
         var settings = await _settingsRepository.GetAsync();
         var autostartEnabled = await _autostartService.IsEnabledAsync();
+        _loadedSettings = settings;
 
         await Dispatcher.EnqueueAsync(() =>
         {
@@ -108,34 +137,66 @@ public sealed class SettingsViewModel : ViewModelBase
             FloatingBallSize = ClampToInt(settings.FloatingBallSize, MinimumFloatingBallSize, MaximumFloatingBallSize);
             LaunchMinimized = settings.LaunchMinimized;
             Paused = settings.Paused;
-            StatusMessage = "Settings loaded";
+            StatusMessage = "Changes apply automatically";
         });
+
+        _isInitializing = false;
     }
 
-    public async Task SaveAsync()
+    private void ScheduleApply()
     {
-        var current = await _settingsRepository.GetAsync();
+        if (_isInitializing)
+        {
+            return;
+        }
+
+        _applyDebounceCts?.Cancel();
+        _applyDebounceCts?.Dispose();
+        _applyDebounceCts = new CancellationTokenSource();
+        var token = _applyDebounceCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(250, token);
+                await ApplyCurrentSettingsAsync(token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore superseded changes.
+            }
+        }, token);
+    }
+
+    private async Task ApplyCurrentSettingsAsync(CancellationToken cancellationToken)
+    {
+        await Dispatcher.EnqueueAsync(() => StatusMessage = "Applying changes...");
+
         var autostartResult = await _autostartService.SetEnabledAsync(AutostartEnabled);
+        cancellationToken.ThrowIfCancellationRequested();
+
         var settings = new AppSettingsModel
         {
             AutostartEnabled = autostartResult,
             FloatingBallEnabled = FloatingBallEnabled,
-            FloatingEdge = current.FloatingEdge,
+            FloatingEdge = _loadedSettings.FloatingEdge,
             LaunchMinimized = LaunchMinimized,
             Paused = Paused,
-            FloatingOffsetX = current.FloatingOffsetX,
-            FloatingOffsetY = current.FloatingOffsetY,
+            FloatingOffsetX = _loadedSettings.FloatingOffsetX,
+            FloatingOffsetY = _loadedSettings.FloatingOffsetY,
             FloatingBallOpacityPercent = ClampToInt(FloatingBallOpacity * 100d, MinimumFloatingBallOpacityPercent, MaximumFloatingBallOpacityPercent),
             FloatingBallSize = ClampToInt(FloatingBallSize, MinimumFloatingBallSize, MaximumFloatingBallSize)
         };
 
-        await _typingMonitorService.ApplySettingsAsync(settings);
+        await _typingMonitorService.ApplySettingsAsync(settings, cancellationToken);
+        _loadedSettings = settings;
 
         await Dispatcher.EnqueueAsync(() =>
         {
             AutostartEnabled = autostartResult;
             StatusMessage = autostartResult || !AutostartEnabled
-                ? "Saved and applied"
+                ? "Applied automatically"
                 : "Autostart request was rejected by the system";
         });
     }
@@ -143,4 +204,3 @@ public sealed class SettingsViewModel : ViewModelBase
     private static int ClampToInt(double value, int minimum, int maximum)
         => (int)Math.Clamp(Math.Round(value), minimum, maximum);
 }
-
