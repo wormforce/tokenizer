@@ -1,0 +1,160 @@
+﻿<Page
+    x:Class="Tokenizer.App.Views.TodayPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Grid
+        x:Name="LayoutRoot"
+        Background="Transparent"
+        HorizontalAlignment="Stretch"
+        Padding="0,0,16,16">
+        <StackPanel Spacing="18">
+                <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Today Overview" />
+
+                <Grid
+                    x:Name="TodayMetricGrid"
+                    ColumnSpacing="16"
+                    RowSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="MetricColumn1" Width="*" />
+                        <ColumnDefinition x:Name="MetricColumn2" Width="*" />
+                        <ColumnDefinition x:Name="MetricColumn3" Width="*" />
+                        <ColumnDefinition x:Name="MetricColumn4" Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition x:Name="MetricRow1" Height="Auto" />
+                        <RowDefinition x:Name="MetricRow2" Height="0" />
+                        <RowDefinition x:Name="MetricRow3" Height="0" />
+                        <RowDefinition x:Name="MetricRow4" Height="0" />
+                    </Grid.RowDefinitions>
+
+                    <Border
+                        x:Name="TodayCharsCard"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource MetricCaptionStyle}" Text="Today chars" />
+                            <TextBlock Style="{StaticResource MetricValueStyle}" Text="{Binding TodayTotalChars}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        x:Name="ThisMinuteCard"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource MetricCaptionStyle}" Text="This minute" />
+                            <TextBlock Style="{StaticResource MetricValueStyle}" Text="{Binding CurrentMinuteChars}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        x:Name="PeakMinuteCard"
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource MetricCaptionStyle}" Text="Peak minute" />
+                            <TextBlock Style="{StaticResource MetricValueStyle}" Text="{Binding PeakMinuteChars}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        x:Name="TopAppCard"
+                        Grid.Row="0"
+                        Grid.Column="3"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource MetricCaptionStyle}" Text="Top app" />
+                            <TextBlock
+                                Style="{StaticResource MetricValueStyle}"
+                                FontSize="22"
+                                Text="{Binding TopAppDisplayName}"
+                                TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid
+                    x:Name="TodayDetailsGrid"
+                    ColumnSpacing="16"
+                    RowSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="DetailsPrimaryColumn" Width="2*" />
+                        <ColumnDefinition x:Name="DetailsSecondaryColumn" Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition x:Name="DetailsRow1" Height="Auto" />
+                        <RowDefinition x:Name="DetailsRow2" Height="0" />
+                    </Grid.RowDefinitions>
+
+                    <Border
+                        x:Name="MinuteChartCard"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel Spacing="12">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="18" Text="Minute Activity" />
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="128"
+                                    DisplayMemberPath="Label"
+                                    ItemsSource="{Binding BucketOptions}"
+                                    SelectedItem="{Binding SelectedBucketOption, Mode=TwoWay}" />
+                                <ComboBox
+                                    Grid.Column="2"
+                                    Width="120"
+                                    DisplayMemberPath="Label"
+                                    ItemsSource="{Binding RangeOptions}"
+                                    SelectedItem="{Binding SelectedRangeOption, Mode=TwoWay}" />
+                            </Grid>
+                            <lvc:CartesianChart
+                                Height="320"
+                                Series="{Binding MinuteSeries}"
+                                XAxes="{Binding XAxes}"
+                                YAxes="{Binding YAxes}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        x:Name="AppRankingCard"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel Spacing="12">
+                            <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="18" Text="App Ranking" />
+                            <ItemsControl ItemsSource="{Binding AppRanking}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock FontFamily="Bahnschrift SemiBold" Text="{Binding DisplayName}" />
+                                                <TextBlock FontSize="12" Opacity="0.7" Text="{Binding ProcessName}" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" FontFamily="Bahnschrift SemiBold" Text="{Binding CharCount}" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+        </StackPanel>
+    </Grid>
+</Page>
+

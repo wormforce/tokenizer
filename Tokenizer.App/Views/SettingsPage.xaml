@@ -1,0 +1,254 @@
+﻿<Page
+    x:Class="Tokenizer.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Grid
+        x:Name="LayoutRoot"
+        Background="Transparent"
+        HorizontalAlignment="Stretch"
+        Padding="0,4,16,24">
+        <StackPanel Spacing="18">
+                <Grid
+                    x:Name="SettingsHeaderGrid"
+                    ColumnSpacing="16"
+                    RowSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition x:Name="SettingsHeaderSecondaryColumn" Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition x:Name="SettingsHeaderSecondaryRow" Height="0" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Settings" />
+                        <TextBlock
+                            MaxWidth="760"
+                            Style="{StaticResource SectionSubtitleStyle}"
+                            Text="Tune startup behavior, tracking, and floating ball appearance in a layout that uses the full window width." />
+                    </StackPanel>
+
+                    <Border
+                        x:Name="SettingsStatusCard"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Padding="16,12"
+                        Background="{StaticResource SurfaceSoftBrush}"
+                        BorderBrush="{StaticResource AccentBrush}"
+                        BorderThickness="1"
+                        CornerRadius="16"
+                        VerticalAlignment="Center">
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{StaticResource MetricCaptionStyle}" Text="Current status" />
+                            <TextBlock
+                                FontFamily="Bahnschrift SemiBold"
+                                FontSize="14"
+                                Text="{Binding StatusMessage}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid
+                    x:Name="SettingsContentGrid"
+                    ColumnSpacing="16"
+                    RowSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="SettingsPrimaryColumn" Width="*" />
+                        <ColumnDefinition x:Name="SettingsSecondaryColumn" Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition x:Name="SettingsContentRow1" Height="Auto" />
+                        <RowDefinition x:Name="SettingsContentRow2" Height="0" />
+                    </Grid.RowDefinitions>
+
+                    <Border
+                        x:Name="SettingsBehaviorCard"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel Spacing="18">
+                            <StackPanel Spacing="4">
+                                <TextBlock Style="{StaticResource CardTitleStyle}" Text="Startup &amp; Tracking" />
+                                <TextBlock
+                                    Style="{StaticResource SectionSubtitleStyle}"
+                                    Text="Control when the app launches and whether typing capture is currently active." />
+                            </StackPanel>
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Style="{StaticResource SettingLabelStyle}" Text="Autostart" />
+                                    <TextBlock
+                                        Style="{StaticResource SectionSubtitleStyle}"
+                                        Text="Launch Tokenizer automatically when Windows signs you in." />
+                                </StackPanel>
+                                <ToggleSwitch
+                                    Grid.Column="1"
+                                    IsOn="{Binding AutostartEnabled, Mode=TwoWay}"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Border Height="1" Background="{StaticResource OutlineBrush}" />
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Style="{StaticResource SettingLabelStyle}" Text="Launch Minimized" />
+                                    <TextBlock
+                                        Style="{StaticResource SectionSubtitleStyle}"
+                                        Text="Start in the tray so the dashboard does not jump in front of your work." />
+                                </StackPanel>
+                                <ToggleSwitch
+                                    Grid.Column="1"
+                                    IsOn="{Binding LaunchMinimized, Mode=TwoWay}"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Border Height="1" Background="{StaticResource OutlineBrush}" />
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Style="{StaticResource SettingLabelStyle}" Text="Pause Tracking" />
+                                    <TextBlock
+                                        Style="{StaticResource SectionSubtitleStyle}"
+                                        Text="Temporarily stop collecting typing data without closing the app." />
+                                </StackPanel>
+                                <ToggleSwitch
+                                    Grid.Column="1"
+                                    IsOn="{Binding Paused, Mode=TwoWay}"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Border Height="1" Background="{StaticResource OutlineBrush}" />
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock Style="{StaticResource CardTitleStyle}" Text="Apply Changes" />
+                                    <TextBlock
+                                        Style="{StaticResource SectionSubtitleStyle}"
+                                        Text="Save the current configuration locally and push it to the tracking service immediately." />
+                                </StackPanel>
+
+                                <Button
+                                    Grid.Column="1"
+                                    MinWidth="152"
+                                    Command="{Binding SaveCommand}"
+                                    Content="Save and Apply"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        x:Name="SettingsFloatingCard"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel Spacing="18">
+                            <StackPanel Spacing="4">
+                                <TextBlock Style="{StaticResource CardTitleStyle}" Text="Floating Ball" />
+                                <TextBlock
+                                    Style="{StaticResource SectionSubtitleStyle}"
+                                    Text="Adjust visibility, docking, and appearance so the overlay fits your desktop without wasting space." />
+                            </StackPanel>
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Style="{StaticResource SettingLabelStyle}" Text="Enable Floating Ball" />
+                                    <TextBlock
+                                        Style="{StaticResource SectionSubtitleStyle}"
+                                        Text="Show the always-on-top typing indicator while the tracking service is running." />
+                                </StackPanel>
+                                <ToggleSwitch
+                                    Grid.Column="1"
+                                    IsOn="{Binding FloatingBallEnabled, Mode=TwoWay}"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Border Height="1" Background="{StaticResource OutlineBrush}" />
+
+                            <StackPanel Spacing="8">
+                                <TextBlock Style="{StaticResource SettingLabelStyle}" Text="Floating Ball Opacity" />
+                                <TextBlock
+                                    Style="{StaticResource SectionSubtitleStyle}"
+                                    Text="Keep the overlay subtle or make it easier to read while you work." />
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider
+                                        Minimum="0.2"
+                                        Maximum="1"
+                                        SmallChange="0.01"
+                                        LargeChange="0.1"
+                                        StepFrequency="0.01"
+                                        Value="{Binding FloatingBallOpacity, Mode=TwoWay}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        MinWidth="54"
+                                        HorizontalTextAlignment="Right"
+                                        Style="{StaticResource SettingLabelStyle}"
+                                        Text="{Binding FloatingBallOpacityLabel}"
+                                        VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+
+                            <Border Height="1" Background="{StaticResource OutlineBrush}" />
+
+                            <StackPanel Spacing="8">
+                                <TextBlock Style="{StaticResource SettingLabelStyle}" Text="Floating Ball Size" />
+                                <TextBlock
+                                    Style="{StaticResource SectionSubtitleStyle}"
+                                    Text="Scale the widget to fit your monitor, layout, and working distance." />
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider
+                                        Minimum="60"
+                                        Maximum="120"
+                                        SmallChange="2"
+                                        LargeChange="10"
+                                        StepFrequency="1"
+                                        Value="{Binding FloatingBallSize, Mode=TwoWay}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        MinWidth="72"
+                                        HorizontalTextAlignment="Right"
+                                        Style="{StaticResource SettingLabelStyle}"
+                                        Text="{Binding FloatingBallSizeLabel}"
+                                        VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+        </StackPanel>
+    </Grid>
+</Page>
+

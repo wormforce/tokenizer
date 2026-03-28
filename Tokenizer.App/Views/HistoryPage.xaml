@@ -1,0 +1,124 @@
+﻿<Page
+    x:Class="Tokenizer.App.Views.HistoryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Grid
+        x:Name="LayoutRoot"
+        Background="Transparent"
+        HorizontalAlignment="Stretch"
+        Padding="0,0,16,16">
+        <StackPanel Spacing="18">
+                <Grid
+                    x:Name="HistoryHeaderGrid"
+                    RowSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition x:Name="HistoryHeaderSecondaryColumn" Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition x:Name="HistoryHeaderSecondaryRow" Height="0" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="History" />
+                    <DatePicker
+                        x:Name="HistoryDatePicker"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Date="{Binding SelectedDate, Mode=TwoWay}"
+                        DateChanged="DatePicker_DateChanged" />
+                </Grid>
+
+                <Border Style="{StaticResource ShellCardStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="18" Text="Recent 14-Day Trend" />
+                        <lvc:CartesianChart
+                            Height="240"
+                            Series="{Binding TrendSeries}"
+                            XAxes="{Binding TrendXAxes}"
+                            YAxes="{Binding YAxes}" />
+                    </StackPanel>
+                </Border>
+
+                <Grid
+                    x:Name="HistoryDetailsGrid"
+                    ColumnSpacing="16"
+                    RowSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="HistoryDetailsPrimaryColumn" Width="2*" />
+                        <ColumnDefinition x:Name="HistoryDetailsSecondaryColumn" Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition x:Name="HistoryDetailsRow1" Height="Auto" />
+                        <RowDefinition x:Name="HistoryDetailsRow2" Height="0" />
+                    </Grid.RowDefinitions>
+
+                    <Border
+                        x:Name="HistoryDayChartCard"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel Spacing="12">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="18" Text="Selected Day Activity" />
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="128"
+                                    DisplayMemberPath="Label"
+                                    ItemsSource="{Binding BucketOptions}"
+                                    SelectedItem="{Binding SelectedBucketOption, Mode=TwoWay}" />
+                                <ComboBox
+                                    Grid.Column="2"
+                                    Width="120"
+                                    DisplayMemberPath="Label"
+                                    ItemsSource="{Binding RangeOptions}"
+                                    SelectedItem="{Binding SelectedRangeOption, Mode=TwoWay}" />
+                            </Grid>
+                            <lvc:CartesianChart
+                                Height="320"
+                                Series="{Binding DaySeries}"
+                                XAxes="{Binding DayXAxes}"
+                                YAxes="{Binding YAxes}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        x:Name="HistoryRankingCard"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource ShellCardStyle}">
+                        <StackPanel Spacing="12">
+                            <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="18" Text="App Ranking" />
+                            <ItemsControl ItemsSource="{Binding TrendRanking}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock FontFamily="Bahnschrift SemiBold" Text="{Binding DisplayName}" />
+                                                <TextBlock FontSize="12" Opacity="0.7" Text="{Binding ProcessName}" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" FontFamily="Bahnschrift SemiBold" Text="{Binding CharCount}" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+        </StackPanel>
+    </Grid>
+</Page>
+

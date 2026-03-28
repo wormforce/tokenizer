@@ -1,0 +1,40 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tokenizer.App", "Tokenizer.App\Tokenizer.App.csproj", "{F9A38D80-A1BE-4A06-93A0-C151C77E6647}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tokenizer.Core", "Tokenizer.Core\Tokenizer.Core.csproj", "{76128957-CC10-4894-A3D1-73EE31360A10}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tokenizer.Infrastructure", "Tokenizer.Infrastructure\Tokenizer.Infrastructure.csproj", "{A2A78E80-3232-4DBA-B716-8EB4B9A1A56A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tokenizer.Tests", "Tokenizer.Tests\Tokenizer.Tests.csproj", "{66B6D87B-D9DF-4222-B616-9D7C4D9BD86C}"
+EndProject
+Global
+  GlobalSection(SolutionConfigurationPlatforms) = preSolution
+    Debug|x64 = Debug|x64
+    Release|x64 = Release|x64
+  EndGlobalSection
+  GlobalSection(ProjectConfigurationPlatforms) = postSolution
+    {F9A38D80-A1BE-4A06-93A0-C151C77E6647}.Debug|x64.ActiveCfg = Debug|x64
+    {F9A38D80-A1BE-4A06-93A0-C151C77E6647}.Debug|x64.Build.0 = Debug|x64
+    {F9A38D80-A1BE-4A06-93A0-C151C77E6647}.Release|x64.ActiveCfg = Release|x64
+    {F9A38D80-A1BE-4A06-93A0-C151C77E6647}.Release|x64.Build.0 = Release|x64
+    {76128957-CC10-4894-A3D1-73EE31360A10}.Debug|x64.ActiveCfg = Debug|Any CPU
+    {76128957-CC10-4894-A3D1-73EE31360A10}.Debug|x64.Build.0 = Debug|Any CPU
+    {76128957-CC10-4894-A3D1-73EE31360A10}.Release|x64.ActiveCfg = Release|Any CPU
+    {76128957-CC10-4894-A3D1-73EE31360A10}.Release|x64.Build.0 = Release|Any CPU
+    {A2A78E80-3232-4DBA-B716-8EB4B9A1A56A}.Debug|x64.ActiveCfg = Debug|x64
+    {A2A78E80-3232-4DBA-B716-8EB4B9A1A56A}.Debug|x64.Build.0 = Debug|x64
+    {A2A78E80-3232-4DBA-B716-8EB4B9A1A56A}.Release|x64.ActiveCfg = Release|x64
+    {A2A78E80-3232-4DBA-B716-8EB4B9A1A56A}.Release|x64.Build.0 = Release|x64
+    {66B6D87B-D9DF-4222-B616-9D7C4D9BD86C}.Debug|x64.ActiveCfg = Debug|x64
+    {66B6D87B-D9DF-4222-B616-9D7C4D9BD86C}.Debug|x64.Build.0 = Debug|x64
+    {66B6D87B-D9DF-4222-B616-9D7C4D9BD86C}.Release|x64.ActiveCfg = Release|x64
+    {66B6D87B-D9DF-4222-B616-9D7C4D9BD86C}.Release|x64.Build.0 = Release|x64
+  EndGlobalSection
+  GlobalSection(SolutionProperties) = preSolution
+    HideSolutionNode = FALSE
+  EndGlobalSection
+EndGlobal
+
