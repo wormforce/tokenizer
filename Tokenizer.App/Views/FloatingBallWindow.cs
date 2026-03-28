@@ -17,6 +17,8 @@ public sealed class FloatingBallWindow
     private const uint MessageShow = NativeMethods.WmApp + 102;
     private const uint MessageHide = NativeMethods.WmApp + 103;
     private const uint MessageClose = NativeMethods.WmApp + 104;
+    private const nuint TopMostRefreshTimerId = 1;
+    private const uint TopMostRefreshIntervalMilliseconds = 1000;
     private const int MinimumCircularSize = 60;
     private const int MaximumCircularSize = 120;
     private const int MinimumOpacityPercent = 20;
@@ -41,6 +43,7 @@ public sealed class FloatingBallWindow
     private bool _movedDuringDrag;
     private bool _hasAppliedExternalSettings;
     private bool _preferCursorMonitorForNextPlacement;
+    private bool _isVisible;
     private nint _arrowCursorHandle;
 
     public FloatingBallWindow()
@@ -203,17 +206,42 @@ public sealed class FloatingBallWindow
                 return 0;
             case MessageApplySettings:
                 ApplySettingsCore();
+                EnsureTopMostCore();
                 return 0;
             case MessageShow:
                 ApplySettingsCore();
+                _isVisible = true;
+                StartTopMostRefreshTimer();
                 NativeMethods.ShowWindow(hWnd, NativeMethods.SwShowNoActivate);
+                EnsureTopMostCore(showWindow: true);
                 return 0;
             case MessageHide:
+                _isVisible = false;
+                StopTopMostRefreshTimer();
                 NativeMethods.ShowWindow(hWnd, NativeMethods.SwHide);
                 return 0;
             case MessageClose:
+                _isVisible = false;
+                StopTopMostRefreshTimer();
                 NativeMethods.DestroyWindow(hWnd);
                 return 0;
+            case NativeMethods.WmDisplayChange:
+            case NativeMethods.WmSettingChange:
+                if (_isVisible)
+                {
+                    ApplySettingsCore();
+                    EnsureTopMostCore();
+                }
+
+                return 0;
+            case NativeMethods.WmTimer:
+                if (wParam == TopMostRefreshTimerId)
+                {
+                    EnsureTopMostCore();
+                    return 0;
+                }
+
+                break;
             case NativeMethods.WmPaint:
                 PaintWindow(hWnd);
                 return 0;
@@ -255,6 +283,8 @@ public sealed class FloatingBallWindow
 
                 break;
             case NativeMethods.WmDestroy:
+                _isVisible = false;
+                StopTopMostRefreshTimer();
                 NativeMethods.PostQuitMessage(0);
                 return 0;
         }
@@ -295,6 +325,7 @@ public sealed class FloatingBallWindow
         }
 
         ApplyPlacementCore(settings.FloatingEdge, settings.FloatingOffsetX, settings.FloatingOffsetY, ballSize);
+        EnsureTopMostCore();
         NativeMethods.InvalidateRect(_windowHandle, 0, false);
     }
 
@@ -495,6 +526,49 @@ public sealed class FloatingBallWindow
             ballSize,
             NativeMethods.SwpNoActivate);
         ClearPreferCursorMonitorForNextPlacement();
+    }
+
+    private void StartTopMostRefreshTimer()
+    {
+        if (_windowHandle == 0)
+        {
+            return;
+        }
+
+        NativeMethods.SetTimer(_windowHandle, TopMostRefreshTimerId, TopMostRefreshIntervalMilliseconds, 0);
+    }
+
+    private void StopTopMostRefreshTimer()
+    {
+        if (_windowHandle == 0)
+        {
+            return;
+        }
+
+        NativeMethods.KillTimer(_windowHandle, TopMostRefreshTimerId);
+    }
+
+    private void EnsureTopMostCore(bool showWindow = false)
+    {
+        if (_windowHandle == 0 || !_isVisible && !showWindow)
+        {
+            return;
+        }
+
+        var flags = NativeMethods.SwpNoMove | NativeMethods.SwpNoSize | NativeMethods.SwpNoActivate;
+        if (showWindow)
+        {
+            flags |= NativeMethods.SwpShowWindow;
+        }
+
+        NativeMethods.SetWindowPos(
+            _windowHandle,
+            NativeMethods.HwndTopMost,
+            0,
+            0,
+            0,
+            0,
+            flags);
     }
 
     private AppSettingsModel GetSettings()

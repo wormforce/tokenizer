@@ -9,6 +9,7 @@ public static class NativeMethods
     public const uint WmKeyDown = 0x0100;
     public const uint WmSysKeyDown = 0x0104;
     public const uint WmCommand = 0x0111;
+    public const uint WmTimer = 0x0113;
     public const uint WmDestroy = 0x0002;
     public const uint WmPaint = 0x000F;
     public const uint WmSetCursor = 0x0020;
@@ -23,6 +24,8 @@ public static class NativeMethods
     public const uint WmLButtonDoubleClick = 0x0203;
     public const uint WmRButtonUp = 0x0205;
     public const uint WmMouseWheel = 0x020A;
+    public const uint WmDisplayChange = 0x007E;
+    public const uint WmSettingChange = 0x001A;
 
     public const uint NifMessage = 0x00000001;
     public const uint NifIcon = 0x00000002;
@@ -404,6 +407,13 @@ public static class NativeMethods
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    public static extern nuint SetTimer(nint hWnd, nuint timerId, uint intervalMilliseconds, nint callback);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool KillTimer(nint hWnd, nuint timerId);
 
     [DllImport("dwmapi.dll")]
     public static extern int DwmSetWindowAttribute(nint hwnd, int attribute, ref int value, int valueSize);
