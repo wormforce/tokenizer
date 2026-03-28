@@ -15,8 +15,8 @@ jobs:
 
     env:
       DOTNET_NOLOGO: true
-      PROJECT_PATH: Tokenizer.App/Tokenizer.App.csproj
       TEST_PROJECT: Tokenizer.Tests/Tokenizer.Tests.csproj
+      TARGET_FRAMEWORK: net8.0-windows10.0.19041.0
       RUNTIME_ID: win-x64
       CONFIGURATION: Release
       PLATFORM: x64
@@ -40,14 +40,40 @@ jobs:
       - name: Test
         run: dotnet test ${{ env.TEST_PROJECT }} -c ${{ env.CONFIGURATION }} -p:Platform=${{ env.PLATFORM }} --no-build
 
-      - name: Publish App
-        run: >
-          dotnet publish ${{ env.PROJECT_PATH }}
-          -c ${{ env.CONFIGURATION }}
-          -r ${{ env.RUNTIME_ID }}
-          -p:Platform=${{ env.PLATFORM }}
-          --self-contained false
-          -o publish/${{ env.APP_NAME }}-${{ env.RUNTIME_ID }}
+      - name: Assemble release payload
+        shell: pwsh
+        run: |
+          $buildDir = Join-Path $PWD "Tokenizer.App/bin/${{ env.PLATFORM }}/${{ env.CONFIGURATION }}/${{ env.TARGET_FRAMEWORK }}/${{ env.RUNTIME_ID }}"
+          $releaseDir = Join-Path $PWD "publish/${{ env.APP_NAME }}-${{ env.RUNTIME_ID }}"
+          if (-not (Test-Path $buildDir)) {
+            throw "Build output directory was not found: $buildDir"
+          }
+
+          if (Test-Path $releaseDir) {
+            Remove-Item $releaseDir -Recurse -Force
+          }
+
+          New-Item -ItemType Directory -Path $releaseDir | Out-Null
+          Copy-Item -Path (Join-Path $buildDir '*') -Destination $releaseDir -Recurse -Force
+
+          $requiredPaths = @(
+            "Tokenizer.App.exe",
+            "Tokenizer.App.dll",
+            "Tokenizer.App.pri",
+            "App.xbf",
+            "MainWindow.xbf",
+            "Views/TodayPage.xbf",
+            "Views/HistoryPage.xbf",
+            "Views/SettingsPage.xbf",
+            "Assets/StoreLogo.png"
+          )
+
+          foreach ($relativePath in $requiredPaths) {
+            $fullPath = Join-Path $releaseDir $relativePath
+            if (-not (Test-Path $fullPath)) {
+              throw "Release payload is missing required file: $relativePath"
+            }
+          }
 
       - name: Create release archive
         shell: pwsh
