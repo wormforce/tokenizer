@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    env:
+      DOTNET_NOLOGO: true
+      PROJECT_PATH: Tokenizer.App/Tokenizer.App.csproj
+      TEST_PROJECT: Tokenizer.Tests/Tokenizer.Tests.csproj
+      RUNTIME_ID: win-x64
+      CONFIGURATION: Release
+      PLATFORM: x64
+      APP_NAME: Tokenizer
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore Tokenizer.sln -p:Platform=${{ env.PLATFORM }}
+
+      - name: Build
+        run: dotnet build Tokenizer.sln -c ${{ env.CONFIGURATION }} -p:Platform=${{ env.PLATFORM }} --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT }} -c ${{ env.CONFIGURATION }} -p:Platform=${{ env.PLATFORM }} --no-build
+
+      - name: Publish App
+        run: >
+          dotnet publish ${{ env.PROJECT_PATH }}
+          -c ${{ env.CONFIGURATION }}
+          -r ${{ env.RUNTIME_ID }}
+          -p:Platform=${{ env.PLATFORM }}
+          --self-contained false
+          -o publish/${{ env.APP_NAME }}-${{ env.RUNTIME_ID }}
+
+      - name: Create release archive
+        shell: pwsh
+        run: |
+          $publishDir = Join-Path $PWD "publish/${{ env.APP_NAME }}-${{ env.RUNTIME_ID }}"
+          $zipPath = Join-Path $PWD "publish/${{ env.APP_NAME }}-${{ env.RUNTIME_ID }}.zip"
+          if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+          Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: publish/${{ env.APP_NAME }}-${{ env.RUNTIME_ID }}.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false
